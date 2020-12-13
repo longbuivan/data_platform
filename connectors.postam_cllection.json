@@ -1,0 +1,134 @@
+{
+	"info": {
+		"_postman_id": "7d5e700d-cdb9-43c4-b8e1-79e815c8543c",
+		"name": "Data",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "kafka-source",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n            \"connector.class\":\"io.confluent.connect.jdbc.JdbcSourceConnector\",\r\n            \"connection.url\":\"jdbc:postgresql://postgres:5432/postgres\",\r\n            \"connection.user\":\"postgres\",\r\n            \"connection.password\":\"postgres\",\r\n            \"poll.interval.ms\":\"1000\",\r\n            \"mode\":\"incrementing\",\r\n            \"incrementing.column.name\":\"index\",\r\n            \"topic.prefix\":\"P_\",\r\n            \"table.whitelist\":\"USERS\",\r\n            \"validate.non.null\":\"false\"\r\n        }"
+				},
+				"url": {
+					"raw": "http://localhost:8083/connectors/SOURCE_POSTGRES/config",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"connectors",
+						"SOURCE_POSTGRES",
+						"config"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "kafka-sink",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"connector.class\" : \"io.confluent.connect.elasticsearch.ElasticsearchSinkConnector\",\r\n  \"connection.url\" : \"http://elasticsearch:9200\",\r\n  \"type.name\" : \"\",\r\n  \"behavior.on.malformed.documents\" : \"warn\",\r\n  \"errors.tolerance\" : \"all\",\r\n  \"errors.log.enable\" : \"true\",\r\n  \"errors.log.include.messages\" : \"true\",\r\n  \"topics\" : \"ratings-enriched,UNHAPPY_PLATINUM_CUSTOMERS\",\r\n  \"key.ignore\" : \"true\",\r\n  \"schema.ignore\" : \"true\",\r\n  \"key.converter\" : \"org.apache.kafka.connect.storage.StringConverter\",\r\n  \"transforms\": \"ExtractTimestamp\",\r\n  \"transforms.ExtractTimestamp.type\": \"org.apache.kafka.connect.transforms.InsertField$Value\",\r\n  \"transforms.ExtractTimestamp.timestamp.field\" : \"EXTRACT_TS\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/connectors/sink_elastic_01/config",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"connectors",
+						"sink_elastic_01",
+						"config"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ksqldb-connector",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n            \"connector.class\" : \"io.debezium.connector.mysql.MySqlConnector\",\r\n            \"database.hostname\" : \"mysql\",\r\n            \"database.port\" : \"3306\",\r\n            \"database.user\" : \"debezium\",\r\n            \"database.password\" : \"dbz\",\r\n            \"database.server.id\" : \"42\",\r\n            \"snapshot.new.tables\":\"parallel\",\r\n            \"database.server.name\" : \"asgard\",\r\n            \"table.whitelist\" : \"demo.customers\",\r\n            \"database.history.kafka.bootstrap.servers\" : \"kafka:29092\",\r\n            \"database.history.kafka.topic\" : \"dbhistory.demo\" ,\r\n            \"include.schema.changes\" : \"false\",\r\n            \"transforms\": \"unwrap,extractkey\",\r\n            \"transforms.unwrap.type\": \"io.debezium.transforms.ExtractNewRecordState\",\r\n            \"transforms.extractkey.type\": \"org.apache.kafka.connect.transforms.ExtractField$Key\",\r\n            \"transforms.extractkey.field\": \"id\",\r\n            \"key.converter\": \"org.apache.kafka.connect.storage.StringConverter\",\r\n            \"value.converter\": \"io.confluent.connect.avro.AvroConverter\",\r\n            \"value.converter.schema.registry.url\": \"http://schema-registry:8081\"\r\n        }"
+				},
+				"url": {
+					"raw": "http://localhost:8083/connectors/source_mysql_01/config",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"connectors",
+						"source_mysql_01",
+						"config"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "kafka-sink-elastic",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"connector.class\" : \"io.confluent.connect.elasticsearch.ElasticsearchSinkConnector\",\r\n  \"connection.url\" : \"http://elasticsearch:9200\",\r\n  \"type.name\" : \"\",\r\n  \"behavior.on.malformed.documents\" : \"warn\",\r\n  \"errors.tolerance\" : \"all\",\r\n  \"errors.log.enable\" : \"true\",\r\n  \"errors.log.include.messages\" : \"true\",\r\n  \"topics\" : \"ratings-enriched,UNHAPPY_PLATINUM_CUSTOMERS\",\r\n  \"key.ignore\" : \"true\",\r\n  \"schema.ignore\" : \"true\",\r\n  \"key.converter\" : \"org.apache.kafka.connect.storage.StringConverter\",\r\n  \"transforms\": \"ExtractTimestamp\",\r\n  \"transforms.ExtractTimestamp.type\": \"org.apache.kafka.connect.transforms.InsertField$Value\",\r\n  \"transforms.ExtractTimestamp.timestamp.field\" : \"EXTRACT_TS\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/connectors/sink_elastic_01/config",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"connectors",
+						"sink_elastic_01",
+						"config"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
